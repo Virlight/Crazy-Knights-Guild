@@ -9,3 +9,5 @@ opencv-python
 numpy
 paddleocr
 ```
+
+the chinese character font can be downloaded at https://github.com/StellarCN/scp_zh.git
