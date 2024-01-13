@@ -1,7 +1,7 @@
 import os
 import pyautogui
 import time
-from PIL import ImageGrab
+from PIL import ImageGrab, Image, ImageDraw, ImageFont
 import cv2
 import numpy as np
 from paddleocr import PaddleOCR
@@ -40,7 +40,7 @@ while True:
 
     # relative frame of img
     frame_left = 100
-    frame_top = 400
+    frame_top = 390
     frame_right = 320
     frame_bottom = 430
     frame_bbox = (frame_left, frame_top, frame_right, frame_bottom)
@@ -60,8 +60,40 @@ while True:
     result2 = ocr.ocr(img_np2, cls=True)
     frame1 = cv2.cvtColor(img_np1, cv2.COLOR_BGR2RGB) # Convert the color to RGB
     frame2 = cv2.cvtColor(img_np2, cv2.COLOR_BGR2RGB) # Convert the color to RGB
-    cv2.imshow("Screen Capture 1", frame1) # Show the first image in an OpenCV window
-    cv2.imshow("Screen Capture 2", frame2) # Show the second image in another OpenCV window
+
+    # 设置中文文字的位置和字体, 只能使用PIL
+    font_path = "./SimHei.ttf" # 替换为您的中文字体文件路径
+    font_size = 12
+    font_color1 = (255, 255, 255) 
+    font_color2 = (255, 255, 255) 
+    image1_pil = Image.fromarray(frame1)
+    image2_pil = Image.fromarray(frame2)
+    draw1 = ImageDraw.Draw(image1_pil)
+    draw2 = ImageDraw.Draw(image2_pil)
+    font = ImageFont.truetype(font_path, font_size)
+    text1 =  f"detected:\n{result1[0][0][1][0]}" if result1[0] else "" 
+    text2 =  f"detected:\n{result2[0][0][1][0]}" if result2[0] else "" 
+    position1 = (0, 5)  # 文字的位置坐标 (x, y)
+    position2 = (60, 3)  # 文字的位置坐标 (x, y)
+    draw1.text(position1, text1, font=font, fill=font_color1)
+    draw2.text(position2, text2, font=font, fill=font_color2)
+    frame1 = np.array(image1_pil)
+    frame2 = np.array(image2_pil)
+
+    # # 如果只输出英文, 可以直接使用cv2
+    # font = cv2.FONT_HERSHEY_SIMPLEX
+    # position = (0, 15)
+    # font_scale = 1
+    # font_color = (255, 255, 255) 
+    # thickness = 2
+    # cv2.putText(frame1, text, position, font, font_scale, font_color, thickness)
+
+    window_name1 = "Fish/Bycatch Name"
+    window_name2 = "Object Feature"
+    cv2.imshow(window_name1, frame1) # Show the first image in an OpenCV window
+    cv2.moveWindow(window_name1, 0, 100) 
+    cv2.imshow(window_name2, frame2) # Show the second image in another OpenCV window
+    cv2.moveWindow(window_name2, 0, 200)
     # Wait for 1 millisecond to update the window and check if the user has pressed the 'q' key
     if cv2.waitKey(1) == ord('q'):
         break
