@@ -1,4 +1,4 @@
-# Crazy-Knights-Guild
+# Earthly-Delight-Council
 auxiliary tool for gaming in Crazy Knights Guild
 
 The fishing files need pip install 
