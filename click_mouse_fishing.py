@@ -12,9 +12,14 @@ import random
 # 1. 自动钓鱼
 # 2. 自动开坐骑
 
-bbox=(549, 122, 963, 858)
+left, top, right, bottom = (549, 122, 963, 858)
+bbox=(left, top, right, bottom)
 img = ImageGrab.grab(bbox=bbox)  # left, top, right, bottom = bbox, 这里的default位置是游戏的位置
 img = ImageGrab.grab()
+
+# while True:
+#     x, y = pyautogui.position()
+#     print(f"X: {x}, Y: {y}")
 
 ####################
 # Fishing
@@ -34,9 +39,10 @@ img = ImageGrab.grab()
 #     print(f"X: {x}, Y: {y}, Colour: {pixel_color}")
 #     time.sleep(1.2)  # 每秒输出一次位置
 
-
 ocr = PaddleOCR(use_angle_cls=True, lang="ch") 
 process_tag = False
+breads_tag = True
+breads_nonce = 10
 
 # Testing code snippet
 while True:
@@ -67,15 +73,26 @@ while True:
     frame_bbox = (frame_left, frame_top, frame_right, frame_bottom)
     img_fragment3 = img.crop(frame_bbox)
 
+    # relative frame of img
+    frame_left = 601 - left
+    frame_top = 193 - top
+    frame_right = 662 - left
+    frame_bottom = 215 - top
+    frame_bbox = (frame_left, frame_top, frame_right, frame_bottom)
+    img_fragment4 = img.crop(frame_bbox)
+
     img_np1 = np.array(img_fragment1) # Convert the image to an array
     img_np2 = np.array(img_fragment2) # Convert the image to an array
     img_np3 = np.array(img_fragment3) # Convert the image to an array
+    img_np4 = np.array(img_fragment4) # Convert the image to an array
     result1 = ocr.ocr(img_np1, cls=True)
     result2 = ocr.ocr(img_np2, cls=True)
     result3 = ocr.ocr(img_np3, cls=True)
+    result4 = ocr.ocr(img_np4, cls=True)
     frame1 = cv2.cvtColor(img_np1, cv2.COLOR_BGR2RGB) # Convert the color to RGB
     frame2 = cv2.cvtColor(img_np2, cv2.COLOR_BGR2RGB) # Convert the color to RGB
     frame3 = cv2.cvtColor(img_np3, cv2.COLOR_BGR2RGB) # Convert the color to RGB
+    frame4 = cv2.cvtColor(img_np4, cv2.COLOR_BGR2RGB) # Convert the color to RGB
 
     # 设置中文文字的位置和字体, 只能使用PIL
     font_path = "./SimHei.ttf" # 替换为您的中文字体文件路径
@@ -107,15 +124,44 @@ while True:
     window_name1 = "Fish/Bycatch Name"
     window_name2 = "Object Feature"
     window_name3 = "Sale Check"
+    window_name4 = "Breads Number"
     cv2.imshow(window_name1, frame1) # Show the first image in an OpenCV window
     cv2.moveWindow(window_name1, 0, 100) 
     cv2.imshow(window_name2, frame2) # Show the second image in another OpenCV window
     cv2.moveWindow(window_name2, 0, 200)
     cv2.imshow(window_name3, frame3) # Show the second image in another OpenCV window
     cv2.moveWindow(window_name3, 0, 300)
+    cv2.imshow(window_name4, frame4) # Show the second image in another OpenCV window
+    cv2.moveWindow(window_name4, 0, 400)
     # Wait for 1 millisecond to update the window and check if the user has pressed the 'q' key
     if cv2.waitKey(1) == ord('q'):
         break
+
+    # Decide the next steps based on the current number of bread.
+    if result4[0]: 
+        breads_info = result4[0][0][1][0]
+        try:
+            # Trying to extract and convert numbers
+            left_breads = int(breads_info.split('/')[0])
+        except ValueError:
+            # If the conversion fails, print an error message and set a default value for left_breads to avoid program stopping
+            print("Invalid input, unable to convert to int.")
+            left_breads = 1
+        print("current breads number:  ", left_breads, " tag: ", breads_tag)
+        if result1[0] or result2[0] or result3[0]:
+            pass
+        elif left_breads == 0:
+            breads_tag = False
+            print("current breads nonce: ", breads_nonce)
+            continue
+        elif breads_tag is False and left_breads < 10 + breads_nonce:
+            print("current breads nonce: ", breads_nonce)
+            continue
+        else: 
+            breads_tag = True
+            breads_nonce = random.randint(0, 10)
+    else:
+        print("Breads detection fails")
 
     # current mouse position
     x, y = pyautogui.position()
