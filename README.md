@@ -10,8 +10,4 @@ numpy
 paddleocr
 ```
 
-the chinese character font can be downloaded at https://github.com/StellarCN/scp_zh.git
-```
-git clone https://github.com/StellarCN/scp_zh.git
-# move scp_zh/fonts/SimHei.tiff to under the same directory of this click_mouse_fishing.py
-```
+The Chinese character font used in this application has been sourced from the https://github.com/StellarCN/scp_zh.git
