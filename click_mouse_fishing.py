@@ -5,6 +5,7 @@ from PIL import ImageGrab, Image, ImageDraw, ImageFont
 import cv2
 import numpy as np
 from paddleocr import PaddleOCR
+import random
 
 
 # functionality;
@@ -35,6 +36,7 @@ img = ImageGrab.grab()
 
 
 ocr = PaddleOCR(use_angle_cls=True, lang="ch") 
+process_tag = False
 
 # Testing code snippet
 while True:
@@ -140,20 +142,33 @@ while True:
         print("detected word: ", result3[0][0][1][0])
     else: 
         print("No detected words \033[0m") 
-        pyautogui.click(x=710, y=670)
+        offset_x = random.randint(-100, 100)  # x偏移量范围
+        offset_y = random.randint(-100, 100)  # y偏移量范围
+        nonce = random.random()
+        if process_tag == False:
+            process_tag = True
+            pyautogui.click(x=740 + offset_x, y=680 + offset_y)
+        elif process_tag == True and nonce < 0.2:
+            process_tag = True
+            pyautogui.click(x=740 + offset_x, y=680 + offset_y)
+        time.sleep(0.1 + random.uniform(0, 0.5))
         continue
     print("\033[0m")
 
-    if result1[0] and (result1[0][0][1][0] == "鲟鱼" or result1[0][0][1][0] == "虎鲨" or result1[0][0][1][0] == "血鹦鹉" or result1[0][0][1][0] == "天竺鲷" or result1[0][0][1][0] == "帝王蟹" or result1[0][0][1][0] == "兰寿金鱼"):
+    if result1[0] and (result1[0][0][1][0] == "吞噬鳗" or result1[0][0][1][0] == "东星斑" or result1[0][0][1][0] == "虎鲨" or result1[0][0][1][0] == "血鹦鹉" or result1[0][0][1][0] == "天竺鲷" or result1[0][0][1][0] == "剑尾鱼" or result1[0][0][1][0] == "帝王蟹" or result1[0][0][1][0] == "兰寿金鱼"):
         if result2[0] and "新纪录" in result2[0][0][1][0]:
             break
-    if result1[0] and (result1[0][0][1][0] == "灵魂鱼" or result1[0][0][1][0] == "玩具鲨"):
+    if result1[0] and (result1[0][0][1][0] == "灵魂鱼" or result1[0][0][1][0] == "玩具鲨" or result1[0][0][1][0] == "拟态章鱼" or result1[0][0][1][0] == "钻石鱼"):
         break
     if result2[0] and ("首次" in result2[0][0][1][0]):
         break
 
-    pyautogui.click(x=710, y=762)
-    time.sleep(0.1)
-    pyautogui.click(x=820, y=580)
-    time.sleep(1.2)
-
+    offset_x = random.randint(-10, 10)  # x偏移量范围
+    offset_y = random.randint(-10, 10)  # y偏移量范围
+    pyautogui.click(x=720 + offset_x, y=762 + offset_y)
+    time.sleep(0.5 + random.uniform(0, 0.5))
+    offset_x = random.randint(-10, 10)  # x偏移量范围
+    offset_y = random.randint(-10, 10)  # y偏移量范围
+    pyautogui.click(x=820+ offset_x, y=580 + offset_y)
+    time.sleep(1.2 + random.uniform(0, 0.5))
+    process_tag == False
